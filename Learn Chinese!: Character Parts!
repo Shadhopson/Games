@@ -1,0 +1,296 @@
+//Learn how to read 16 common Chinese words!
+//Just Click to Start!
+void setup() { 
+  size(400, 400); 
+} 
+void setup() { 
+  size(400, 400); 
+  
+} 
+
+//Learn how to read 16 common Chinese words!
+//Just Click to Start!
+var started = false;
+var mandarin = [
+["貓","mao1","Cat",["卄 grass","田 field","豸 beast"]],
+["狗","gou3","Dog",["犭 dog", "句 to bend"]],
+["是","shi4","To Be, Yes",["曰 speak","正 right"]],
+["我","wo3","Me, Myself, I",["手 hand","戈 halberd"]],
+["在","zai4","Be At, In",["才 talent", "土 earth"]],
+["到","dao4","To Arrive, To Go,Until",["至 arrive","刂 knife"]],
+["資","zi1","Money, Resources",["貝 shell,money","次 order"]],
+["這","zhe4","This",["辶 walk","言 speak,words"]],
+["個","ge5", "Measurement Word",["亻 person","固 solidify"]],
+["你","ni3","You",["尒 you","亻 person"]],
+["好","hao3","Good",["女 woman","子 child"]],
+["就","jiu4","Just Simply",["尤 especially","京 capital city"]],
+["他","ta1","He, She, It",["亻 person","也 also"]],["來","lai2","Come",["木 tree","从 come"]],
+["說","shuo1","speak",["言 words","兌 barter"]],
+["們","men5","plural marker for pronouns",["亻 person","門 door"]],
+["和","he2", "and",["禾 rice","口 mouth"]]
+];
+var dictionary = [];
+var choices = [];
+var clicked = [];
+var chosenCharacter;
+var choiceBoxSize= 97;
+var answerSize =14;
+var correct = false;
+var count = 0;
+var score =0;
+var backgroundColor  = color(187, 214, 240);
+var fontColor = color(114, 23, 135);
+//var avatar1 = getImage("avatars/piceratops-seed");
+//var avatar2 =getImage("avatars/piceratops-seedling");
+//var avatar3 = getImage("avatars/piceratops-sapling");
+//var avatar4 = getImage("avatars/piceratops-tree");
+//var avatar5 =getImage("avatars/piceratops-ultimate");
+//class for all the characters
+var Characters = function(char,pinyin,english,parts){
+    this.char =char;
+    this.pinyin=pinyin;
+    this.english=english;
+    this.parts=parts;
+};
+//put words in lists into the dictionary as character objects
+for(var i =0; i < mandarin.length;i++){
+    dictionary.push(new Characters(mandarin[i][0],mandarin[i][1],mandarin[i][2], mandarin[i][3]));
+}
+//choose a random character
+var chooseCharacter = function(){
+    chosenCharacter = round(random(0,dictionary.length-1));
+};
+//checks if possible answers are repeating
+var alreadyInList = function(value,list){
+    for(var i =0; i<list.length;i++){
+    if(list[i] === value){
+        return true;
+    }
+}
+};
+
+var shuffleList = function(list){
+    var tempList = [];
+    for(var i =list.length-1; i>=0;i--){
+        var choice = round(random(0,list.length-1));
+        tempList.push(list[choice]);
+        list.splice(choice,1);
+    }
+    list = tempList;
+    
+    return tempList;
+};
+//choose the characters to choose from
+var chooseChoices = function(){
+    //get the parts from the chosen character
+    for (var i =0; i < dictionary[chosenCharacter].parts.length; i++){
+        choices.push(dictionary[chosenCharacter].parts[i]);
+    }
+    //get random parts from other characters so total parts = 9
+  while(choices.length <9){
+        var randomCharacter =round(random(0,dictionary.length-1));
+        var randomChoice =  round(random(0,dictionary[randomCharacter].parts.length-1));
+        if (alreadyInList(dictionary[randomCharacter].parts[randomChoice],choices)){
+            continue;
+        }
+        else{
+           
+            choices.push(dictionary[randomCharacter].parts[randomChoice]);
+           
+        }
+    }
+    //randomize the order of the list
+    choices =shuffleList(choices);
+};
+var list1InList2 = function(list1,list2){
+    for(var i =0; i<list1.length; i++){
+        if(!alreadyInList(list1[i], list2)){
+            return false;
+        }
+    }
+    return true;
+};
+var answerClicked = function(){
+    //Note the clicked choices and empty it out when too many are chosen.
+    var count =0;
+    for(var i=50;i<350;i+=100){
+        for(var k=150;k<301;k+=75){
+    if(mouseX>i && mouseX< i+choiceBoxSize&& mouseY>k && mouseY < k+70){
+                if(clicked.length ===dictionary[chosenCharacter].parts.length){
+                    clicked = [];
+               
+                }
+               clicked.push(choices[count]);
+               //check if the answer is right
+               if(list1InList2(dictionary[chosenCharacter].parts,clicked)){         background(backgroundColor);
+                    text("That's Right",50,50);
+                    chooseCharacter();
+                    choices = [];
+                    chooseChoices();
+                    clicked=[];
+                    //background(backgroundColor);
+                    correct = true;
+               }
+                /*if(clicked.length >dictionary[chosenCharacter].parts.length){
+                    clicked = [];
+               
+                }*/
+            }
+               count++;
+               //text(count, 10,10);
+        }
+    }
+};
+//draws the answer choices and adds an indicator when you click them
+var drawChoices = function(){
+    var count =0;
+    //draw 9 rectangles at these x y coordinates
+    for(var i=50;i<350;i+=100){
+        for(var k=150;k<301;k+=75){
+            stroke(83, 127, 230);
+            strokeWeight(2);
+            //note when you click on a rectangle
+            
+            for(var j = 0; j< clicked.length;j++){
+                if(choices[count] === clicked[j]){
+                    stroke(196, 0, 255);
+                }
+            }
+             fill(247, 239, 239);
+            rect(i,k,choiceBoxSize,30,10);
+            rect(i,k+30,choiceBoxSize,40,10);
+            stroke(83, 127, 230);
+            fill(114, 23, 135);
+            //if(count<9){
+            textSize(answerSize);
+            text(choices[count].slice(2),i+5,k+20);
+            textSize(answerSize*1.5);
+            text(choices[count][0],i+37,k+55);
+            //}
+            count++;
+            
+        }
+    }
+   // text(choices[8],20,380);
+};
+
+var answerBoxes = function(){
+    for(var i =0; i< dictionary[chosenCharacter].parts.length;i++){
+         fill(242, 233, 233);
+        rect(62+i*choiceBoxSize*1.12,80,choiceBoxSize*1.12,50,10);
+        fill(114, 23, 135);
+        textSize(answerSize);
+        text(clicked[i],65+i*choiceBoxSize*1.12,110);
+       // text(dictionary[chosenCharacter].parts,20,20);
+    }
+};
+
+var victoryScreen = function(){
+    var backgroundColor  = color(187, 214, 240);
+    var fontColor = color(114, 23, 135);
+    var sizeOfText = 22;
+    //var messageWidth = width/2-sizeOfText/4*message1.length;
+    
+    var message1 = "New Word!";
+    var message2 = dictionary[chosenCharacter].english;
+    var message3 = "is made out of "+dictionary[chosenCharacter].parts.length+ " characters";
+    var message4 = dictionary[chosenCharacter].parts;
+    var message5 = "together they make:";
+    var message6 = dictionary[chosenCharacter].char;
+    var message7 = dictionary[chosenCharacter].pinyin;
+    background(backgroundColor);
+    fill(fontColor);
+    textSize(sizeOfText);
+    fill(255, 246, 201);
+    noStroke();
+    rect(width/2-sizeOfText/3*message1.length-10,height/8-30,15.2*message1.length,50,4);
+    fill(fontColor);
+    
+    text(message1,width/2-sizeOfText/3*message1.length,height/8);
+    fill(255, 246, 201);
+    rect(10,height/4-15,width-20,height-115,5);
+    fill(189, 55, 199);
+    text(message2,width/2-sizeOfText/4*message2.length,height/4+15);
+    fill(fontColor);
+    text(message3,width/2-sizeOfText/4*message3.length,height*3/8+15);
+    fill(189, 55, 199);
+    text(message4,width/2-sizeOfText/4*(message4.length*9),height*4/8+15);
+    fill(fontColor);
+    text(message5, width/2-sizeOfText/4*message5.length,height*5/8+15);
+    fill(189, 55, 199);
+    textSize(50);
+    text(message6,175,height*6/8+25);
+    textSize(sizeOfText);
+    text(message7, width/2-sizeOfText/4*message7.length, height*6.6/8+25);
+    fill(fontColor);
+    text(score +" Points Earned!",105,395);
+    textSize(15);
+    if(score < 30){
+        //image(avatar1,10,0,70,70);
+        text("Newbie",15,80);
+    }
+    else if(score >= 30 && score < 60){
+        //image(avatar2,10,0,70,70);
+        text("Student",15,80);
+    }
+   else  if(score >= 60 && score < 100){
+        //image(avatar3,10,0,70,70);
+        text("Apprentice",15,80);
+    }
+   else if(score >= 100 && score < 150){
+        //image(avatar4,10,0,70,70);
+        text("Skilled",15,80);
+    }
+    else{
+        //image(avatar5,10,0,70,70);
+        text("Master",15,80);
+    }
+};
+void mouseClicked(){
+    //chooseCharacter();
+    background(187, 214, 240);
+    textSize(20);
+    text(dictionary[chosenCharacter].english,177-dictionary[chosenCharacter].english.length*6,27);
+    //text(dictionary[chosenCharacter].char,180,80);
+    text(dictionary[chosenCharacter].pinyin,180-dictionary[chosenCharacter].pinyin.length*6,50);
+    textSize(answerSize);
+    //chooseChoices();
+    if(count !==0){
+    answerClicked();
+    }
+    if(correct===false){
+        drawChoices();
+        answerBoxes();
+        count++;
+    }
+    else{
+        count =0;
+        score+=10;
+        victoryScreen();
+        
+    }
+    fill(fontColor);
+    textSize(20);
+    //text(score +" Points Earned!",105,395);
+    correct = false;
+};
+background(187, 214, 240);
+textSize(answerSize);
+chooseCharacter();
+chooseChoices();
+/*
+drawChoices();
+answerBoxes();
+
+textSize(20);
+fill(114, 23, 135);
+//textSize(20);
+text(dictionary[chosenCharacter].english,179-dictionary[chosenCharacter].english.length*7,27);
+    //text(dictionary[chosenCharacter].char,180,80);
+    text(dictionary[chosenCharacter].pinyin,180-dictionary[chosenCharacter].pinyin.length*7,50);*/
+void draw() {
+    if(started === false){
+        victoryScreen();
+        started=true;
+    }
+};
